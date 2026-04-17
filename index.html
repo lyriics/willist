@@ -4,7 +4,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="willist.css">
   <title>Willist</title>
 </head>
 
@@ -45,7 +45,21 @@
     let lista = []
     let lista_feita = []
 
-    window.onload = atualizarLista
+    // Carregar do Local Storage ao abrir
+    window.onload = () => {
+      const pendentesSalvos = localStorage.getItem("listaPendentes")
+      const concluidosSalvos = localStorage.getItem("listaConcluidos")
+
+      if (pendentesSalvos) lista = JSON.parse(pendentesSalvos)
+      if (concluidosSalvos) lista_feita = JSON.parse(concluidosSalvos)
+
+      atualizarLista()
+    }
+
+    function salvarLocalStorage() {
+      localStorage.setItem("listaPendentes", JSON.stringify(lista))
+      localStorage.setItem("listaConcluidos", JSON.stringify(lista_feita))
+    }
 
     function mostrarInput() {
       const area = document.getElementById("areaInput")
@@ -59,6 +73,7 @@
 
       if (valor !== "") {
         lista.push(valor)
+        salvarLocalStorage()
         input.value = ""
         atualizarLista()
         document.getElementById("areaInput").classList.add("hidden")
@@ -71,6 +86,7 @@
       setTimeout(() => {
         let item = lista.splice(index, 1)[0]
         lista_feita.push(item)
+        salvarLocalStorage()
         atualizarLista()
       }, 400)
     }
@@ -106,7 +122,7 @@
 
       if (lista_feita.length === 0) {
         let p = document.createElement("p")
-
+        p.textContent = "Nenhuma tarefa concluída"
         p.classList.add("listaVaziaMsg")
         concluidos.appendChild(p)
       } else {
@@ -124,6 +140,7 @@
 
       setTimeout(() => {
         lista = []
+        salvarLocalStorage()
         atualizarLista()
         pendentes.classList.remove("lista-explodir")
       }, 500)
@@ -135,6 +152,7 @@
 
       setTimeout(() => {
         lista_feita = []
+        salvarLocalStorage()
         atualizarLista()
         concluidos.classList.remove("lista-explodir")
       }, 500)
