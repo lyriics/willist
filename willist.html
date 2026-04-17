@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="willist.css">
+  <title>Willist</title>
+</head>
+
+<body>
+
+  <h1>List</h1>
+
+  <div class="containerLista">
+    <div class="bar">
+      <button class="barBtn" onclick="mostrarInput()">Adicionar</button>
+      <button class="barBtn" onclick="limparPendentes()">Limpar</button>
+    </div>
+
+    <div class="listas" id="listaDiv">
+      <h3>Pendentes</h3>
+
+      <div id="areaInput" class="inputArea hidden">
+        <input type="text" id="inputItem" placeholder="Digite uma tarefa..." onkeypress="if(event.key === 'Enter') adicionarItem()">
+      </div>
+
+      <div id="itensPendentes"></div>
+    </div>
+  </div>
+
+  <div class="containerLista">
+    <div class="bar">
+      <h3 class="tituloBar">Concluídos</h3>
+      <button class="barBtn" onclick="limparConcluidos()">Limpar</button>
+    </div>
+
+    <div class="listas" id="listafeitaDiv">
+      <h3>Concluídos</h3>
+      <div id="itensConcluidos"></div>
+    </div>
+  </div>
+
+  <script>
+    let lista = []
+    let lista_feita = []
+
+    window.onload = atualizarLista
+
+    function mostrarInput() {
+      const area = document.getElementById("areaInput")
+      area.classList.remove("hidden")
+      document.getElementById("inputItem").focus()
+    }
+
+    function adicionarItem() {
+      let input = document.getElementById("inputItem")
+      let valor = input.value.trim()
+
+      if (valor !== "") {
+        lista.push(valor)
+        input.value = ""
+        atualizarLista()
+        document.getElementById("areaInput").classList.add("hidden")
+      }
+    }
+
+    function concluirItem(index, elemento) {
+      elemento.classList.add("item-saindo")
+
+      setTimeout(() => {
+        let item = lista.splice(index, 1)[0]
+        lista_feita.push(item)
+        atualizarLista()
+      }, 400)
+    }
+
+    function atualizarLista() {
+      let pendentes = document.getElementById("itensPendentes")
+      pendentes.innerHTML = ""
+
+      if (lista.length === 0) {
+        let p = document.createElement("p")
+        p.textContent = "Não há tarefas pendentes"
+        p.classList.add("listaVaziaMsg")
+        pendentes.appendChild(p)
+      } else {
+        lista.forEach((item, index) => {
+          let p = document.createElement("p")
+
+          let checkbox = document.createElement("input")
+          checkbox.type = "checkbox"
+          checkbox.onchange = () => concluirItem(index, p)
+
+          let span = document.createElement("span")
+          span.textContent = " " + item
+
+          p.appendChild(checkbox)
+          p.appendChild(span)
+          pendentes.appendChild(p)
+        })
+      }
+
+      let concluidos = document.getElementById("itensConcluidos")
+      concluidos.innerHTML = ""
+
+      if (lista_feita.length === 0) {
+        let p = document.createElement("p")
+
+        p.classList.add("listaVaziaMsg")
+        concluidos.appendChild(p)
+      } else {
+        lista_feita.forEach(item => {
+          let p = document.createElement("p")
+          p.textContent = "✔ " + item
+          concluidos.appendChild(p)
+        })
+      }
+    }
+
+    function limparPendentes() {
+      let pendentes = document.getElementById("itensPendentes")
+      pendentes.classList.add("lista-explodir")
+
+      setTimeout(() => {
+        lista = []
+        atualizarLista()
+        pendentes.classList.remove("lista-explodir")
+      }, 500)
+    }
+
+    function limparConcluidos() {
+      let concluidos = document.getElementById("itensConcluidos")
+      concluidos.classList.add("lista-explodir")
+
+      setTimeout(() => {
+        lista_feita = []
+        atualizarLista()
+        concluidos.classList.remove("lista-explodir")
+      }, 500)
+    }
+  </script>
+
+</body>
+
+</html>
